@@ -61,7 +61,7 @@ First, the function adds the `kernel` keyword, which declares that the function 
 - A *public GPU function*. Public functions are the only functions that your app can see. Public functions also can't be called by other shader functions.
 - A *compute function* (also known as a compute kernel), which performs a parallel calculation using a grid of threads.
 
-See Using a Render Pipeline to Render Primitives to learn the other function keywords used to declare public graphics functions.
+See [Using a Render Pipeline to Render Primitives](https://developer.apple.com/documentation/metal/using_a_render_pipeline_to_render_primitives) to learn the other function keywords used to declare public graphics functions.
 
 The `add_arrays` function declares three of its arguments with the `device` keyword, which says that these pointers are in the `device` address space.
 MSL defines several disjoint address spaces for memory.
@@ -123,9 +123,9 @@ To get an object representing the `add_arrays` function, ask the [`MTLDevice`][M
     if (self)
     {
         _mDevice = device;
-        
+
         NSError* error = nil;
-        
+
         // Load the shader files with a .metal file extension in the project
 
         id<MTLLibrary> defaultLibrary = [_mDevice newDefaultLibrary];
@@ -213,7 +213,7 @@ To fill a buffer with random data, the app gets a pointer to the buffer's memory
 - (void) generateRandomFloatData: (id<MTLBuffer>) buffer
 {
     float* dataPtr = buffer.contents;
-    
+
     for (unsigned long index = 0; index < arrayLength; index++)
     {
         dataPtr[index] = (float)rand()/(float)(RAND_MAX);
@@ -356,8 +356,14 @@ Because the calculations are only used to illustrate the process of creating a M
 
     for (unsigned long index = 0; index < arrayLength; index++)
     {
-        assert(result[index] == a[index] + b[index]);
+        if (result[index] != (a[index] + b[index]))
+        {
+            printf("Compute ERROR: index=%lu result=%g vs %g=a+b\n",
+                   index, result[index], a[index] + b[index]);
+            assert(result[index] == (a[index] + b[index]));
+        }
     }
+    printf("Compute results as expected\n");
 }
 ```
 
