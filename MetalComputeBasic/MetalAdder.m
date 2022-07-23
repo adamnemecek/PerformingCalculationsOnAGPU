@@ -8,7 +8,7 @@ A class to manage all of the Metal objects this app creates.
 #import "MetalAdder.h"
 
 // The number of floats in each array, and the size of the arrays in bytes.
-const unsigned int arrayLength = 1 << 24;
+const unsigned int arrayLength = 10;
 const unsigned int bufferSize = arrayLength * sizeof(float);
 
 @implementation MetalAdder
@@ -108,7 +108,11 @@ const unsigned int bufferSize = arrayLength * sizeof(float);
     // but in this example, the code simply blocks until the calculation is complete.
     [commandBuffer waitUntilCompleted];
 
-    [self verifyResults];
+//    commandBuffer wait
+
+    [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer> _Nonnull encoder) {
+        [self verifyResults];
+    }];
 }
 
 - (void)encodeAddCommand:(id<MTLComputeCommandEncoder>)computeEncoder {
@@ -136,27 +140,31 @@ const unsigned int bufferSize = arrayLength * sizeof(float);
 
 - (void) generateRandomFloatData: (id<MTLBuffer>) buffer
 {
-    float* dataPtr = buffer.contents;
+    uint32 *dataPtr = buffer.contents;
 
     for (unsigned long index = 0; index < arrayLength; index++)
     {
-        dataPtr[index] = (float)rand()/(float)(RAND_MAX);
+//        dataPtr[index] = (float)rand()/(float)(RAND_MAX);
+        dataPtr[index] = (uint32)(1000 + index);
+//        printf("%f\n", dataPtr[index]);
     }
 }
 - (void) verifyResults
 {
-    float* a = _mBufferA.contents;
-    float* b = _mBufferB.contents;
-    float* result = _mBufferResult.contents;
+    uint32_t *a = _mBufferA.contents;
+    uint32_t *b = _mBufferB.contents;
+    uint32_t *result = _mBufferResult.contents;
+//    _mBufferA fence
 
     for (unsigned long index = 0; index < arrayLength; index++)
     {
-        if (result[index] != (a[index] + b[index]))
-        {
-            printf("Compute ERROR: index=%lu result=%g vs %g=a+b\n",
-                   index, result[index], a[index] + b[index]);
-            assert(result[index] == (a[index] + b[index]));
-        }
+//        if (result[index] != (a[index] + b[index]))
+//        {
+//            printf("Compute ERROR: index=%lu result=%g vs %g=a+b\n",
+//                   index, result[index], a[index] + b[index]);
+//            assert(result[index] == (a[index] + b[index]));
+//        }
+        printf("%d\n", a[index]);
     }
     printf("Compute results as expected\n");
 }
